@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { ApolloServer } = require("apollo-server-express");
 const authResolvers = require("./src/resolvers/authResolvers");
-const typeDefs = require("./src/schema/typeDefs");
+const authTypeDefs = require("./src/schema/authSchema");
 const postTypeDefs = require('./src/schema/postSchema');
 const postResolver = require('./src/resolvers/postResolvers');
 const userResolver = require('./src/resolvers/userResolvers');
@@ -17,7 +17,7 @@ app.use(express.json());
 
 // Initialize Apollo Server
 const apolloServer = new ApolloServer({
-  typeDefs: [typeDefs, postTypeDefs, userTypeDefs],
+  typeDefs: [authTypeDefs, postTypeDefs, userTypeDefs],
   resolvers: [authResolvers, postResolver, userResolver],
   context: ({ req }) => ({
     db,
