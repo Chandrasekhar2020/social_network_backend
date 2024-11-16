@@ -22,13 +22,8 @@ initializeApp(firebaseConfig);
 
 const auth = getAuth();
 
-const signup = async (req, res) => {
-  const { displayName, email, password, phoneNumber } = req.body;
-  try {
-    const userDetails = await admin.auth().getUserByEmail(email);
-    if (!userDetails.emailVerified) {
-      return res.status(400).json({ error: "Email is not verified" });
-    }
+const authService = {
+  async signup({ displayName, email, password, phoneNumber }) {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
@@ -36,9 +31,7 @@ const signup = async (req, res) => {
     );
     const user = userCredential.user;
     await sendEmailVerification(user);
-    console.log("Verification email sent.");
 
-    // Create user document in Firestore
     await db
       .collection("users")
       .doc(user.uid)
@@ -49,60 +42,58 @@ const signup = async (req, res) => {
         createdAt: new Date().toISOString(),
       });
 
-    res.status(200).json({
-      uid: user.uid,
-      email: user.email,
+    return {
+      user: {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || "",
+        phoneNumber: user.phoneNumber || "",
+        createdAt: user.createdAt,
+      },
       message:
         "Please verify your email address before logging in. Check your inbox for the verification link.",
-    });
-  } catch (error) {
-    console.error("Error during signup:", error);
-    res.status(400).json({ error: error.message, code: error.code });
-  }
-};
+    };
+  },
 
-const login = (req, res) => {
-  const { email, password } = req.body;
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      if (!user.emailVerified) {
-        throw {
-          message: "Email not verified.",
-          code: "auth/email-not-verified",
-        };
-      }
-      return user.getIdToken().then((idToken) => ({ user, idToken }));
-    })
-    .then(({ user, idToken }) => {
-      res
-        .status(200)
-        .json({ uid: user.uid, email: user.email, token: idToken });
-    })
-    .catch((error) => {
-      console.error("Error during login:", error);
-      res.status(400).json({ error: error.message, code: error.code });
-    });
-};
+  async login({ email, password }) {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const user = userCredential.user;
 
-const forgotPassword = async (req, res) => {
-  const { email } = req.body;
-  try {
+    if (!user.emailVerified) {
+      throw new Error("Email not verified.");
+    }
+
+    const idToken = await user.getIdToken();
+
+    const userDoc = await db.collection("users").doc(user.uid).get();
+    if (!userDoc.exists) {
+      throw new Error("User not found in database");
+    }
+    const userData = userDoc.data();
+    return {
+      user: {
+        uid: user.uid,
+        email: user.email,
+        displayName: userData.displayName || "",
+        phoneNumber: userData.phoneNumber || "",
+        createdAt: userData.createdAt,
+      },
+      token: idToken,
+    };
+  },
+
+  async forgotPassword({ email }) {
     await sendPasswordResetEmail(auth, email);
-    res.status(200).json({
-      message: "Password reset email sent successfully. Please check your inbox.",
-      email: email,
-    });
-  } catch (error) {
-    console.error("Error sending password reset email:", error);
-    res.status(400).json({ error: error.message, code: error.code });
-  }
+    return {
+      message:
+        "Password reset email sent successfully. Please check your inbox.",
+      user: { email },
+    };
+  },
 };
 
-
-
-module.exports = {
-  signup,
-  login,
-  forgotPassword,
-};
+module.exports = authService;
