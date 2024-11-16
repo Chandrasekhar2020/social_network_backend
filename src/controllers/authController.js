@@ -1,4 +1,3 @@
-// Start of Selection
 const { db, admin } = require("../config/firebase");
 const { initializeApp } = require("firebase/app");
 const {
@@ -6,6 +5,7 @@ const {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendEmailVerification,
+  sendPasswordResetEmail,
 } = require("firebase/auth");
 
 const { getUserProfile } = require("../services/authService");
@@ -25,8 +25,12 @@ initializeApp(firebaseConfig);
 const auth = getAuth();
 
 const signup = async (req, res) => {
-  const { displayName, email, password } = req.body;
+  const { displayName, email, password, phoneNumber } = req.body;
   try {
+    const userDetails = await admin.auth().getUserByEmail(email);
+    if (!userDetails.emailVerified) {
+      return res.status(400).json({ error: "Email is not verified" });
+    }
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
@@ -43,6 +47,7 @@ const signup = async (req, res) => {
       .set({
         displayName: displayName || "",
         email: user.email,
+        phoneNumber: phoneNumber || "",
         createdAt: new Date().toISOString(),
       });
 
@@ -63,21 +68,17 @@ const resendVerificationEmail = async (req, res) => {
   try {
     // Fetch the user by email using Firebase Admin SDK
     const userRecord = await admin.auth().getUserByEmail(email);
+    
+    // Check if email is already verified
     if (userRecord.emailVerified) {
-      return res.status(400).json({ message: "Email is already verified." });
-    }
-    // Generate a new email verification link
-    const verificationLink = await admin
-      .auth()
-      .generateEmailVerificationLink(email, {
-        // Optionally, you can add actionCodeSettings here
-        url: "https://www.example.com/finishSignUp?cartId=1234",
-        handleCodeInApp: true,
+      return res.status(400).json({ 
+        error: "Email is already verified",
+        code: "auth/email-already-verified"
       });
-    // TODO: Send the verificationLink via your email service provider
-    // For example, using SendGrid, Nodemailer, etc.
-    // Example:
-    // await sendEmail(email, verificationLink);
+    }
+    
+    await sendEmailVerification(userRecord.user);
+    
     console.log("Verification email resent.");
     res.status(200).json({
       message: "Verification email sent successfully. Please check your inbox.",
@@ -91,7 +92,6 @@ const resendVerificationEmail = async (req, res) => {
 
 const login = (req, res) => {
   const { email, password } = req.body;
-  // Start of Selection
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const user = userCredential.user;
@@ -114,8 +114,23 @@ const login = (req, res) => {
     });
 };
 
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    await sendPasswordResetEmail(auth, email);
+    res.status(200).json({
+      message: "Password reset email sent successfully. Please check your inbox.",
+      email: email,
+    });
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    res.status(400).json({ error: error.message, code: error.code });
+  }
+};
+
 module.exports = {
   signup,
   login,
   resendVerificationEmail,
+  forgotPassword,
 };

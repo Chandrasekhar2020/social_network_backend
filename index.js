@@ -5,6 +5,8 @@ const typeDefs = require("./src/schemas/typeDefs");
 const resolvers = require("./src/resolvers");
 const { db } = require("./src/config/firebase");
 const authRoutes = require('./src/routes/authRoutes');
+const postRoutes = require('./src/routes/postRoutes');
+const userRoutes = require('./src/routes/userRoutes');
 
 const app = express();
  
@@ -16,7 +18,17 @@ app.use(express.json());
 app.get('/', (_, res) => {
   res.send('Welcome to the Social Network API');
 });
+
+// Mount routes
 app.use('/api/auth', authRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/users', userRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ error: err.message || 'Internal Server Error' });
+});
 
 // Initialize Apollo Server with type definitions and resolvers
 const apolloServer = new ApolloServer({
