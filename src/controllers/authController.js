@@ -55,7 +55,7 @@ const authService = {
     };
   },
 
-  async login({ email, password }) {
+  async login({ email, password, fcmToken }) {
     const userCredential = await signInWithEmailAndPassword(
       auth,
       email,
@@ -80,6 +80,7 @@ const authService = {
         email: user.email,
         displayName: userData.displayName || "",
         phoneNumber: userData.phoneNumber || "",
+        fcmToken: userData.fcmToken || "",
         createdAt: userData.createdAt,
       },
       token: idToken,

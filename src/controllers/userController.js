@@ -91,10 +91,15 @@ const userService = {
 
       const followRef = await db.collection("user_follows").add(followData);
 
+      // Get the follower's display name
+      const followerDoc = await db.collection("users").doc(userId).get();
+      const followerData = followerDoc.data();
+
       // Get the followed user's FCM token
       const followedUserDoc = await db.collection("users").doc(followingId).get();
       const followedUserData = followedUserDoc.data();
 
+      console.log(followedUserData.fcmToken)
       if (followedUserData.fcmToken) {
         const message = {
           notification: {

@@ -30,6 +30,7 @@ const typeDefs = gql`
     login(
       email: String!
       password: String!
+      fcmToken: String
     ): AuthResponse!
     
     forgotPassword(
