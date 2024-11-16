@@ -8,8 +8,6 @@ const {
   sendPasswordResetEmail,
 } = require("firebase/auth");
 
-const { getUserProfile } = require("../services/authService");
-
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
   authDomain: "",
