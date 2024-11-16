@@ -152,44 +152,58 @@ const getFollowing = async (req, res) => {
 
 // Get posts from followed users
 const getFollowedUsersPosts = async (req, res) => {
-  const userId = req.user.uid; // Current user's ID
+  const userId = req.user.uid;
 
   try {
     // Get list of users that the current user follows
     const followingQuery = await db
       .collection("user_follows")
-      .where("following_id", "==", userId)
+      .where("user_id", "==", userId)
       .get();
 
-    // Extract followee IDs
-    const followeeIds = [];
+    const followingIds = [];
     followingQuery.forEach((doc) => {
-      followeeIds.push(doc.data().followee_id);
+      followingIds.push(doc.data().following_id);
     });
 
-    if (followeeIds.length === 0) {
+    if (followingIds.length === 0) {
       return res.status(200).json({ posts: [] });
     }
+    
+    // Add debug logging
+    console.log('Following IDs:', followingIds);
 
     // Get posts from followed users
     const postsQuery = await db
       .collection("posts")
-      .where("user_id", "in", followeeIds)
-      .orderBy("created_at", "desc")
-      .limit(50) // Limit the number of posts returned
+      .where("user_id", "in", followingIds)
+      .orderBy("createdAt", "desc")
+      .limit(50)
       .get();
+
+    // Add debug logging
+    console.log('Posts query size:', postsQuery.size);
+    console.log('Posts query empty:', postsQuery.empty);
 
     const posts = [];
     postsQuery.forEach((doc) => {
-      posts.push({
+      const post = {
         id: doc.id,
-        ...doc.data(),
-      });
+        ...doc.data()
+      };
+      console.log('Found post:', post); // Debug individual posts
+      posts.push(post);
     });
 
     res.status(200).json({ posts });
   } catch (error) {
+    // Enhance error logging
     console.error("Error getting feed:", error);
+    console.error("Error details:", {
+      userId,
+      errorMessage: error.message,
+      errorCode: error.code
+    });
     res.status(500).json({ error: error.message });
   }
 };
