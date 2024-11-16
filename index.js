@@ -3,6 +3,8 @@ const cors = require('cors');
 const { ApolloServer } = require("apollo-server-express");
 const authResolvers = require("./src/resolvers/authResolvers");
 const typeDefs = require("./src/schema/typeDefs");
+const postTypeDefs = require('./src/schema/postSchema');
+const postResolver = require('./src/resolvers/postResolvers');
 const { db } = require("./src/config/firebase");
 
 const app = express();
@@ -13,8 +15,8 @@ app.use(express.json());
 
 // Initialize Apollo Server
 const apolloServer = new ApolloServer({
-  typeDefs,
-  resolvers: authResolvers,
+  typeDefs: [typeDefs, postTypeDefs],
+  resolvers: [authResolvers, postResolver],
   context: ({ req }) => ({
     db,
     req
