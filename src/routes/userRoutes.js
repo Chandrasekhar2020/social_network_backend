@@ -3,6 +3,7 @@ const router = express.Router();
 const { authenticateUser: auth } = require("../middlewares/authMiddleware");
 const {
   getProfile,
+  updateProfile,
   followUser,
   unfollowUser,
   getFollowers,
@@ -11,6 +12,7 @@ const {
 } = require('../controllers/userController');
 
 router.get('/profile', auth, getProfile);
+router.put('/profile', auth, updateProfile);
 
 // Follow routes
 router.post('/follow/:followingId', auth, followUser);

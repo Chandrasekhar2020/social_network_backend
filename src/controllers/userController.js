@@ -1,4 +1,4 @@
-const { db } = require("../config/firebase");
+const { db, admin } = require("../config/firebase");
 const { use } = require("../routes/userRoutes");
 
 // Get user profile
@@ -21,6 +21,35 @@ const getProfile = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Start Generation Here
+const updateProfile = async (req, res) => {
+  const userId = req.user.uid; // Get user ID from auth middleware
+  const { displayName, phoneNumber } = req.body;
+
+  try {
+    // Fetch the user document
+    const userDoc = db.collection("users").doc(userId);
+
+    // Prepare the updates
+    const updates = {};
+    if (displayName !== undefined) updates.displayName = displayName;
+    if (phoneNumber !== undefined) updates.phoneNumber = phoneNumber;
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: "No valid fields to update" });
+    }
+
+    // Update the user document
+    await userDoc.update(updates);
+
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Follow a user
 const followUser = async (req, res) => {
   const userId = req.user.uid; // Current user's ID
@@ -230,6 +259,7 @@ const getFollowedUsersPosts = async (req, res) => {
 
 module.exports = {
   getProfile,
+  updateProfile,
   followUser,
   unfollowUser,
   getFollowers,
