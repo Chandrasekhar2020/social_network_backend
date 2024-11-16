@@ -40,7 +40,7 @@ const userResolvers = {
         const decodedToken = await admin.auth().verifyIdToken(token);
         context.user = decodedToken;
         
-        return userService.getUserFollowers(parent, args, context);
+        return userService.getFollowers(parent, args, context);
       } catch (error) {
         console.error('Token verification error:', error);
         throw new Error('Invalid or expired token');
@@ -62,7 +62,7 @@ const userResolvers = {
         const decodedToken = await admin.auth().verifyIdToken(token);
         context.user = decodedToken;
         
-        return userService.getUserFollowing(parent, args, context);
+        return userService.getFollowing(parent, args, context);
       } catch (error) {
         console.error('Token verification error:', error);
         throw new Error('Invalid or expired token');
@@ -93,7 +93,7 @@ const userResolvers = {
   },
 
   Mutation: {
-    updateUserProfile: async (parent, args, context) => {
+    updateProfile: async (parent, args, context) => {
       const authHeader = context.req.headers.authorization;
       if (!authHeader) {
         throw new Error('Authentication token required');
@@ -108,7 +108,7 @@ const userResolvers = {
         const decodedToken = await admin.auth().verifyIdToken(token);
         context.user = decodedToken;
         
-        return userService.updateUserProfile(parent, args, context);
+        return userService.updateProfile(parent, args, context);
       } catch (error) {
         console.error('Token verification error:', error);
         throw new Error('Invalid or expired token');

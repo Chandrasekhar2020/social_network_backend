@@ -5,6 +5,8 @@ const authResolvers = require("./src/resolvers/authResolvers");
 const typeDefs = require("./src/schema/typeDefs");
 const postTypeDefs = require('./src/schema/postSchema');
 const postResolver = require('./src/resolvers/postResolvers');
+const userResolver = require('./src/resolvers/userResolvers');
+const userTypeDefs = require('./src/schema/userSchema');
 const { db } = require("./src/config/firebase");
 
 const app = express();
@@ -15,8 +17,8 @@ app.use(express.json());
 
 // Initialize Apollo Server
 const apolloServer = new ApolloServer({
-  typeDefs: [typeDefs, postTypeDefs],
-  resolvers: [authResolvers, postResolver],
+  typeDefs: [typeDefs, postTypeDefs, userTypeDefs],
+  resolvers: [authResolvers, postResolver, userResolver],
   context: ({ req }) => ({
     db,
     req
