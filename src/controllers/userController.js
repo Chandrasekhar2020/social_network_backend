@@ -91,6 +91,26 @@ const userService = {
 
       const followRef = await db.collection("user_follows").add(followData);
 
+      // Get the followed user's FCM token
+      const followedUserDoc = await db.collection("users").doc(followingId).get();
+      const followedUserData = followedUserDoc.data();
+
+      if (followedUserData.fcmToken) {
+        const message = {
+          notification: {
+            title: 'New Follower',
+            body: `${followerData.displayName} started following you`
+          },
+          token: followedUserData.fcmToken
+        };
+
+        try {
+          await admin.messaging().send(message);
+        } catch (fcmError) {
+          console.error("Error sending notification:", fcmError);
+        }
+      }
+
       return {
         uid: followRef.id,
         ...followData,
