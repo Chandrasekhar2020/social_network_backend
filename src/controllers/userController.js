@@ -1,10 +1,30 @@
 const { db } = require("../config/firebase");
 const { use } = require("../routes/userRoutes");
 
+// Get user profile
+const getProfile = async (req, res) => {
+  const userId = req.user.uid; // Get user ID from auth middleware
+  try {
+    const userDoc = await db.collection("users").doc(userId).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: "User profile not found" });
+    }
+    const userData = userDoc.data();
+    res.status(200).json({
+      uid: userId,
+      email: userData.email,
+      displayName: userData.displayName,
+      phoneNumber: userData.phoneNumber,
+    });
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
 // Follow a user
 const followUser = async (req, res) => {
   const userId = req.user.uid; // Current user's ID
-  if(!userId){
+  if (!userId) {
     return res.status(400).json({ error: "User ID is required" });
   }
   const { followingId } = req.params; // User to follow
@@ -169,9 +189,9 @@ const getFollowedUsersPosts = async (req, res) => {
     if (followingIds.length === 0) {
       return res.status(200).json({ posts: [] });
     }
-    
+
     // Add debug logging
-    console.log('Following IDs:', followingIds);
+    console.log("Following IDs:", followingIds);
 
     // Get posts from followed users
     const postsQuery = await db
@@ -182,16 +202,16 @@ const getFollowedUsersPosts = async (req, res) => {
       .get();
 
     // Add debug logging
-    console.log('Posts query size:', postsQuery.size);
-    console.log('Posts query empty:', postsQuery.empty);
+    console.log("Posts query size:", postsQuery.size);
+    console.log("Posts query empty:", postsQuery.empty);
 
     const posts = [];
     postsQuery.forEach((doc) => {
       const post = {
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       };
-      console.log('Found post:', post); // Debug individual posts
+      console.log("Found post:", post); // Debug individual posts
       posts.push(post);
     });
 
@@ -202,13 +222,14 @@ const getFollowedUsersPosts = async (req, res) => {
     console.error("Error details:", {
       userId,
       errorMessage: error.message,
-      errorCode: error.code
+      errorCode: error.code,
     });
     res.status(500).json({ error: error.message });
   }
 };
 
 module.exports = {
+  getProfile,
   followUser,
   unfollowUser,
   getFollowers,

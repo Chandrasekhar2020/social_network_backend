@@ -1,12 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateUser: auth } = require("../middlewares/authMiddleware");const {
+const { authenticateUser: auth } = require("../middlewares/authMiddleware");
+const {
+  getProfile,
   followUser,
   unfollowUser,
   getFollowers,
   getFollowing,
   getFollowedUsersPosts
 } = require('../controllers/userController');
+
+router.get('/profile', auth, getProfile);
 
 // Follow routes
 router.post('/follow/:followingId', auth, followUser);

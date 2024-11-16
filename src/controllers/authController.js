@@ -63,33 +63,6 @@ const signup = async (req, res) => {
   }
 };
 
-const resendVerificationEmail = async (req, res) => {
-  const { email } = req.body;
-  try {
-    // Fetch the user by email using Firebase Admin SDK
-    const userRecord = await admin.auth().getUserByEmail(email);
-    
-    // Check if email is already verified
-    if (userRecord.emailVerified) {
-      return res.status(400).json({ 
-        error: "Email is already verified",
-        code: "auth/email-already-verified"
-      });
-    }
-    
-    await sendEmailVerification(userRecord.user);
-    
-    console.log("Verification email resent.");
-    res.status(200).json({
-      message: "Verification email sent successfully. Please check your inbox.",
-      email: email,
-    });
-  } catch (error) {
-    console.error("Error resending verification email:", error);
-    res.status(500).json({ error: "Failed to send verification email." });
-  }
-};
-
 const login = (req, res) => {
   const { email, password } = req.body;
   signInWithEmailAndPassword(auth, email, password)
@@ -128,9 +101,10 @@ const forgotPassword = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   signup,
   login,
-  resendVerificationEmail,
   forgotPassword,
 };
