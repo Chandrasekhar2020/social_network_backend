@@ -6,6 +6,6 @@
     ],
     "routes":
     [
-        {"src":"/graphql","dest":"/index.js"}
+        {"src":"/(.*)","dest":"/index.js"}
     ]
 }
