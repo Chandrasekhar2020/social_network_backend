@@ -36,11 +36,11 @@ const startServer = async () => {
       cors: false
     });
     
-    // const PORT = process.env.PORT || 4000;
+    const PORT = process.env.PORT || 4000;
     
-    // app.listen(PORT, () => {
-    //   console.log(` GraphQL endpoint at http://localhost:${PORT}/graphql`);
-    // });
+    app.listen(PORT, () => {
+      console.log(` GraphQL endpoint at http://localhost:${PORT}/graphql`);
+    });
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
