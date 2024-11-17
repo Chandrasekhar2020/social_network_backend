@@ -73,6 +73,7 @@ const authService = {
     if (!userDoc.exists) {
       throw new Error("User not found in database");
     }
+    await db.collection("users").doc(user.uid).update({ fcmToken });
     const userData = userDoc.data();
     return {
       user: {

@@ -11,11 +11,11 @@ const { db } = require("./src/config/firebase");
 
 const app = express();
  
-// Middleware
+
 app.use(cors());
 app.use(express.json());
 
-// Initialize Apollo Server
+
 const apolloServer = new ApolloServer({
   typeDefs: [authTypeDefs, postTypeDefs, userTypeDefs],
   resolvers: [authResolvers, postResolver, userResolver],
@@ -27,7 +27,6 @@ const apolloServer = new ApolloServer({
   playground: true
 });
 
-// Apply Apollo GraphQL middleware and start server
 const startServer = async () => {
   try {
     await apolloServer.start();
@@ -40,8 +39,7 @@ const startServer = async () => {
     const PORT = process.env.PORT || 4000;
     
     app.listen(PORT, () => {
-      console.log(`🚀 Server ready at http://localhost:${PORT}`);
-      console.log(`📈 GraphQL endpoint at http://localhost:${PORT}/graphql`);
+      console.log(` GraphQL endpoint at http://localhost:${PORT}/graphql`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

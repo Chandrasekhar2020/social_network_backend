@@ -1,15 +1,15 @@
 const { db } = require("../config/firebase");
 
-// GraphQL Resolvers for Posts
+
 const postService = {
-  // Get all posts
+
   async getAllPosts(parent, args, context) {
     const userId = context.user.uid;
 
     try {
       const postsSnapshot = await db
         .collection("posts")
-        .orderBy("createdAt", "desc") // Optional: sort by creation date
+        .orderBy("createdAt", "desc") 
         .get();
 
       const posts = [];
@@ -17,7 +17,7 @@ const postService = {
         posts.push({
           id: doc.id,
           ...doc.data(),
-          isOwner: doc.data().user_id === userId, // Add ownership flag
+          isOwner: doc.data().user_id === userId, 
         });
       });
 
@@ -28,7 +28,6 @@ const postService = {
     }
   },
 
-  // Get a single post by ID
   async getPostById(_, { postId }, context) {
     if (!context.user) {
       throw new Error("Authentication required.");
@@ -46,7 +45,7 @@ const postService = {
       return {
         id: postDoc.id,
         ...postData,
-        isOwner: postData.user_id === userId, // Add ownership flag
+        isOwner: postData.user_id === userId, 
       };
     } catch (error) {
       console.error("Error fetching post:", error);
@@ -54,7 +53,7 @@ const postService = {
     }
   },
 
-  // Create a new post
+  
   async createPost(_, { heading, description }, context) {
     if (!context.user) {
       throw new Error("Authentication required.");
@@ -91,7 +90,7 @@ const postService = {
     }
   },
 
-  // Update a post
+
   async updatePost(_, { postId, heading, description }, context) {
     if (!context.user) {
       throw new Error("Authentication required.");
@@ -122,7 +121,7 @@ const postService = {
 
       await postRef.update(updateData);
 
-      // Get the updated post data
+   
       const updatedPost = await postRef.get();
       return {
         id: postId,
@@ -135,7 +134,7 @@ const postService = {
     }
   },
 
-  // Delete a post
+
   deletePost: async (_, { postId }, context) => {
     if (!context.user) {
       throw new Error("Authentication required.");

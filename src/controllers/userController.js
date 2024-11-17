@@ -1,7 +1,8 @@
 const { db } = require("../config/firebase");
+const admin = require("firebase-admin");
 
 const userService = {
-  // Get user profile
+ 
   async getUserProfile(_, args, context) {
     if (!context.user) {
       throw new Error("Authentication required.");
@@ -27,7 +28,6 @@ const userService = {
     }
   },
 
-  // Update user profile
   async updateProfile(_, { displayName, phoneNumber }, context) {
     if (!context.user) {
       throw new Error("Authentication required.");
@@ -48,7 +48,7 @@ const userService = {
 
       await userDoc.update(updates);
 
-      // Get updated user data
+  
       const updatedUserDoc = await userDoc.get();
       return {
         uid: userId,
@@ -61,7 +61,7 @@ const userService = {
     }
   },
 
-  // Follow a user
+ 
   async followUser(_, { followingId }, context) {
     if (!context.user) {
       throw new Error("Authentication required.");
@@ -127,7 +127,6 @@ const userService = {
     }
   },
 
-  // Unfollow a user
   async unfollowUser(_, { followingId }, context) {
     if (!context.user) {
       throw new Error("Authentication required.");
@@ -153,7 +152,7 @@ const userService = {
     }
   },
 
-  // Get followers of a user
+  
   async getFollowers(_, { userId }, context) {
     if (!context.user) {
       throw new Error("Authentication required.");
