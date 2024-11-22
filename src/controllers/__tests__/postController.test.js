@@ -1,11 +1,11 @@
 const { db } = require('../../config/firebase');
 const postService = require('../postController');
 
-// Mock Firebase
+
 jest.mock('../../config/firebase');
 
 describe('Post Service', () => {
-  // Mock context and common test data
+ 
   const mockContext = {
     user: {
       uid: 'test-user-123',
@@ -32,7 +32,7 @@ describe('Post Service', () => {
 
   describe('getAllPosts', () => {
     it('should fetch all posts successfully', async () => {
-      // Mock Firestore query response
+      
       const mockSnapshot = {
         forEach: (callback) => {
           callback({

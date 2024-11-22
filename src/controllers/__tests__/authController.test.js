@@ -2,12 +2,12 @@ const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sen
 const { db } = require('../../config/firebase');
 const authService = require('../authController');
 
-// Mock Firebase modules
+
 jest.mock('firebase/auth');
 jest.mock('../../config/firebase');
 
 describe('Auth Service', () => {
-  // Setup common test data
+
   const mockUser = {
     uid: 'test-uid-123',
     email: 'test@example.com',
@@ -22,35 +22,35 @@ describe('Auth Service', () => {
     createdAt: '2024-03-20T00:00:00.000Z'
   };
 
-  // Create mockAuth object
+ 
   const mockAuth = {
     currentUser: null
   };
 
   beforeEach(() => {
-    // Clear all mocks before each test
+    
     jest.clearAllMocks();
     
-    // Setup getAuth mock
+   
     getAuth.mockReturnValue(mockAuth);
 
-    // Setup createUserWithEmailAndPassword mock
+ 
     createUserWithEmailAndPassword.mockResolvedValue({ user: mockUser });
 
-    // Setup signInWithEmailAndPassword mock
+  
     signInWithEmailAndPassword.mockImplementation((auth, email, password) => {
       return Promise.resolve({ user: mockUser });
     });
 
-    // Setup sendPasswordResetEmail mock
+
     sendPasswordResetEmail.mockImplementation((auth, email) => {
       return Promise.resolve();
     });
 
-    // Setup sendEmailVerification mock
+  
     sendEmailVerification.mockResolvedValue();
 
-    // Mock Firestore
+    
     const mockSet = jest.fn().mockResolvedValue();
     db.collection.mockReturnValue({
       doc: jest.fn().mockReturnValue({
@@ -70,7 +70,7 @@ describe('Auth Service', () => {
 
       await authService.signup(signupData);
 
-      // Check if the function was called with the correct parameters in any order
+     
       expect(createUserWithEmailAndPassword.mock.calls[0]).toEqual(
         expect.arrayContaining([signupData.email, signupData.password])
       );
@@ -79,7 +79,7 @@ describe('Auth Service', () => {
 
   describe('login', () => {
     it('should login user successfully with verified email', async () => {
-      // Mock Firestore get operation
+     
       db.collection.mockReturnValue({
         doc: jest.fn().mockReturnValue({
           get: jest.fn().mockResolvedValue({
@@ -116,7 +116,7 @@ describe('Auth Service', () => {
     it('should reject login when user not found in database', async () => {
       signInWithEmailAndPassword.mockResolvedValue({ user: mockUser });
 
-      // Mock non-existent user in Firestore
+     
       db.collection.mockReturnValue({
         doc: jest.fn().mockReturnValue({
           get: jest.fn().mockResolvedValue({

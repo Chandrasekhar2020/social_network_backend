@@ -1,12 +1,12 @@
-    // Start Generation Here
+   
 const { db } = require('../../config/firebase');
 const userController = require('../userController');
 
-// Mock Firebase modules
+
 jest.mock('../../config/firebase');
 
 describe('User Controller', () => {
-  // Setup common test data
+  
   const mockContext = {
     user: {
       uid: 'test-user-123',
@@ -17,7 +17,7 @@ describe('User Controller', () => {
     it('should successfully follow a user', async () => {
       const followingId = 'followed-user-456';
 
-      // Mock Firestore queries
+      
       const mockFollowQuery = {
         empty: true,
       };
@@ -50,7 +50,7 @@ describe('User Controller', () => {
     it('should throw error when already following the user', async () => {
       const followingId = 'followed-user-456';
 
-      // Mock Firestore query with existing follow
+     
       const mockFollowQuery = {
         empty: false,
       };
@@ -79,7 +79,7 @@ describe('User Controller', () => {
     it('should handle database errors', async () => {
       const followingId = 'followed-user-456';
 
-      // Mock Firestore to throw an error
+      
       db.collection.mockImplementation(() => {
         throw new Error('Database error');
       });
@@ -94,7 +94,7 @@ describe('User Controller', () => {
     it('should successfully unfollow a user', async () => {
       const followingId = 'followed-user-456';
 
-      // Mock Firestore query to find the follow relation
+      
       const mockFollowQuery = {
         empty: false,
         docs: [{
@@ -121,7 +121,6 @@ describe('User Controller', () => {
     it('should throw error when follow relationship not found', async () => {
       const followingId = 'followed-user-456';
 
-      // Mock Firestore query with no existing follow
       const mockFollowQuery = {
         empty: true,
       };
@@ -150,7 +149,6 @@ describe('User Controller', () => {
     it('should handle database errors', async () => {
       const followingId = 'followed-user-456';
 
-      // Mock Firestore to throw an error
       db.collection.mockImplementation(() => {
         throw new Error('Database error');
       });
@@ -181,13 +179,13 @@ describe('User Controller', () => {
         }
       ];
 
-      // Mock the followers query
+
       const mockFollowersQuery = {
         docs: mockFollowers,
         forEach: (callback) => mockFollowers.forEach(callback)
       };
 
-      // Setup the mock chain
+
       db.collection.mockReturnValue({
         where: jest.fn().mockReturnValue({
           get: jest.fn().mockResolvedValue(mockFollowersQuery)
@@ -215,11 +213,11 @@ describe('User Controller', () => {
     it('should return empty array when user has no followers', async () => {
       const userId = 'test-user-123';
       
-      // Mock empty followers query
+  
       const mockEmptyQuery = {
         docs: [],
         empty: true,
-        forEach: (callback) => {} // Empty forEach implementation
+        forEach: (callback) => {} 
       };
 
       db.collection.mockReturnValue({
@@ -244,7 +242,7 @@ describe('User Controller', () => {
     it('should handle database errors', async () => {
       const userId = 'test-user-123';
 
-      // Mock database error
+  
       db.collection.mockImplementation(() => {
         throw new Error('Database error');
       });
@@ -255,5 +253,5 @@ describe('User Controller', () => {
     });
   });
 
-  // Additional test cases for other userController functions can be added here
+
 });

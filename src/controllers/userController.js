@@ -188,7 +188,7 @@ const userService = {
     }
   },
 
-  // Get users that a user is following
+ 
   async getFollowing(_, { userId }, context) {
     if (!context.user) {
       throw new Error("Authentication required.");

@@ -4,7 +4,7 @@ const admin = require('firebase-admin');
 const postResolvers = {
   Query: {
     getPosts: async (parent, args, context) => {
-      // Extract token from context.req headers
+      
       const authHeader = context.req.headers.authorization;
       if (!authHeader) {
         throw new Error('Authentication token required');
@@ -16,7 +16,7 @@ const postResolvers = {
           throw new Error('Invalid token format');
         }
 
-        // Verify and decode the token
+       
         const decodedToken = await admin.auth().verifyIdToken(token);
         context.user = decodedToken;
         

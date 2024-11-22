@@ -29,6 +29,7 @@ const authService = {
       email,
       password
     );
+    
     const user = userCredential.user;
     await sendEmailVerification(user);
 
